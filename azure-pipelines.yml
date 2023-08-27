@@ -1,0 +1,31 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install -g pm2
+    npm install  # Install your application dependencies
+    pm2 build server.js --name node-learn  # Build your application
+  displayName: 'Build Node.js application using PM2'
+
+- script: |
+    pm2 save
+    pm2 startup
+  displayName: 'Configure PM2 for startup'
+
+- script: |
+    pm2 start server.js --name node-learn  # Start your application with PM2
+  displayName: 'Start Node.js application using PM2'
